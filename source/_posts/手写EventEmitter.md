@@ -96,7 +96,7 @@ myEvent.emit = function (type, data) {
 _Event.on('search', e => {
     console.log(e.detail);
 });
-_Event.emit('search', 'dosth');
+_Event.emit('search', 'dosth ');
 ```
 
 ### 2.实现一个可以手动触发的Event管理器
