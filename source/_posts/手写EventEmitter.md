@@ -2,7 +2,7 @@
 title: 手写EventEmitter
 date: 2018-03-20 15:11:28
 categories:
-- 
+- JavaScript
 tags:
 - JavaScript
 - Design Pattern
