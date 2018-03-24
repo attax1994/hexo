@@ -2,7 +2,7 @@
 title: 你不知道的JavaScript上卷 第二部分
 date: 2018-03-19 16:06:19
 categories: 
-- books
+- 读书笔记
 tags: 
 - books
 - 你不知道的JavaScript

@@ -2,6 +2,8 @@
 menu:
   Home: /
   Archives: /archives
+  Resume: https://attax1994.github.io/Resume/index.html
+  TodoList: /categories/学习计划
 rss: /atom.xml
 
 # Content
