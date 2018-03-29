@@ -2,10 +2,9 @@
 title: 手写EventEmitter
 date: 2018-03-20 15:11:28
 categories:
-- JavaScript
+- 前端开发
 tags:
-- JavaScript
-- Design Pattern
+- 设计模式
 ---
 <hr>
 

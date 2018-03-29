@@ -5,7 +5,6 @@ categories:
 - tutorial
 tags: 
 - hexo
-- tutorial
 ---
 
 # Hexo配置过程
