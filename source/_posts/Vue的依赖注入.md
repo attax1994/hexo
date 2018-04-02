@@ -186,7 +186,7 @@ class TemplateComponent {
 
 `InversifyJS`的使用方式类似于Angular的依赖注入模式：
 
-1. 创建声明
+创建声明
 
 ```JS
 // 声明一系列的接口
@@ -215,7 +215,7 @@ const TYPES = {
 export { TYPES };
 ```
 
-2. 编写实现
+编写实现
 
 ```JS
 // 针对先前的声明，创建具体的实现类
@@ -266,7 +266,7 @@ class Ninja implements Warrior {
 }
 ```
 
-3. 创建一个容器，放置服务类
+创建一个容器，放置服务类
 
 ```JS
 import { Container } from "inversify";
@@ -283,7 +283,7 @@ myContainer.bind<ThrowableWeapon>(TYPES.ThrowableWeapon).to(Shuriken);
 export { myContainer };
 ```
 
-4. 注入依赖
+注入依赖
 
 ```JS
 import { myContainer } from "./inversify.config";
