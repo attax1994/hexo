@@ -294,3 +294,91 @@ import { Warrior } from "./interfaces";
 const ninja = myContainer.get<Warrior>(TYPES.Warrior);
 ```
 
+#### 4. 利用TypeScript实现Ultimate Mode
+
+首先声明一个ModuleManager模块来负责依赖管理
+
+```typescript
+const ModuleManager = (function () {
+  // debug模式下可以放在window下进行检查
+  // 实际生产环境不建议暴露在window下，而是使用内部变量
+  (window as any).Modules = {};
+  const modules = window.Modules;
+
+  // 使用哈希值来作为键（这个设计可有可无）
+  function BKDRHash(str: string): number {
+    const seed: number = 31;
+    let hash: number = 0,
+      index: number = 0;
+    while (str[index]) {
+      hash = hash * seed + str.charCodeAt(index++);
+      hash &= 0xFFFFFFFF;
+    }
+    return hash;
+  }
+
+  // 对对应模块生成一个单例，注册到modules中，
+  function addModule(target: any): void {
+    const hash = BKDRHash(target.toString().replace(/^function\s(.*)?\s.*/, '$1'));
+    if (!modules[hash]) {
+      modules[hash] = new target();
+    }
+  }
+
+  // 从moudules里取出某个模块的单例
+  function getModule(target: any): any {
+    const hash = BKDRHash(target.toString().replace(/^function\s(.*)?\s.*/, '$1'));
+    if (!modules[hash]) {
+      modules[hash] = new target();
+    }
+    return modules[hash];
+  }
+
+  return {
+    addModule,
+    getModule,
+  }
+}());
+```
+
+然后需要利用TypeScript提供的Decorator修饰器，来对模块与注入的依赖进行管理
+
+```JS
+/**
+ * 在需要注入的模块类上添加该修饰器，可以生成一个单例，纳入ModuleManager的管理
+ * @returns {(target: any) => void}
+ * @constructor
+ */
+const Injectable = (): ClassDecorator => (target: Function): any => {
+  ModuleManager.addModule(target);
+};
+
+// 模块注册示例
+@Injectable()
+export class SomeModule {}
+
+/**
+ * 改造被注入的类中，某个属性的描述器，从而使其承载被注入的依赖
+ * @param module
+ * @returns {PropertyDecorator}
+ * @constructor
+ */
+const Provided = (module: any): PropertyDecorator => (target: Object, name: string | symbol): any => {
+  return {
+    configurable: true,
+    enumerable: false,
+    // 不允许直接对其进行set，应当通过模块暴露的public方法去操作
+    set: () => {},
+    // getter设置为返回这个module的单例
+    get: () => {
+      return ModuleManager.getModule(module);
+    },
+  };
+};
+
+// 依赖注入示例
+export class Example {
+  @Provided(SomeModule) private _someModule: SomeModule;
+}
+```
+
