@@ -1,9 +1,9 @@
 ---
-title: [译]任务（Tasks）、微任务（microtasks）、队列（queues）与调度（schedules）
+title: （译）任务（Tasks），微任务（microtasks），队列（queues）与调度（schedules）
 date: 2018-05-11 15:50:36
 categories: 
 - 前端开发
-tags: 
+tags:
 - 技术原理
 ---
 
@@ -11,9 +11,7 @@ tags:
 
 注：本文非原文的通篇翻译，而是节选部分深入原理的部分进行翻译。
 
-
-
-# 任务（Tasks）、微任务（microtasks）、队列（queues）与任务安排（schedules）
+## 任务（Tasks）、微任务（microtasks）、队列（queues）与任务安排（schedules）
 
 试试下面这一段JavaScript
 
