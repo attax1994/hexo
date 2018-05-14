@@ -122,7 +122,7 @@ function hasOwn(obj: Object | Array<any>, key: string): boolean {
 }
 ```
 
-### 2.3 串转换函数
+### 2.3 字符串转换函数
 
 ```typescript
 // 创建某个纯函数的闭包，该闭包有一个结果缓存，对于运算量较大的函数，可以减少重复运算
