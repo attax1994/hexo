@@ -1,33 +1,26 @@
 ---
-title: Vue源码解析3--core与core.util-部分core模块通用函数
-date: 2018-05-14 22:21:10
+title: Vue源码解析04--core.util-部分core模块通用函数
+date: 2019-04-26 18:31:04
 categories: 
-- 源码分析
-tags:
-- Vue
+- 前端开发
+tags: 
+- 技术原理
 ---
 
-## 1. index.js
+# Core/Util主体结构
 
-core的入口主要做这几件事：
-
-- 初始化全局API
-- 定义Vue.prototype的`$isServer`、`$ssrContext`属性
-- 定义Vue的`FunctionalRenderContext`属性
-- `Vue.version = '__VERSION__'`
-- `export default Vue`
-
-
-
-## 2. config.js
-
-`core/config.js`用于定义Vue全局设置的类型和初始设置。
-
-该初始设置绝大部分涉及到`shared`目录下的共享对象和函数。
+- **next-tick**：`Vue.nextTick`的实现
+- **props**：用于合法化prop，并加入observe
+- **options**：Component构造函数中输入的options所需的相关处理
+- **lang**：一些通用的检测与类型转换的封装
+- **error**：针对`ViewModel`的错误信息的输出
+- **perm**：Performance API的封装
+- **env**：运行环境的检测
+- **debug**：警告信息与错误栈的生成与输出，方便调试时排错
 
 
 
-## 3. util/next-tick.js
+## 1. util/next-tick.js
 
 `Vue.nextTick()`的实现，其优先级为：
 
@@ -36,8 +29,18 @@ core的入口主要做这几件事：
 3. `MessageChannel`：macro
 4. `setTimeout`：macro
 
+### 建模
+
+对于`nextTick()`方法，它需要以下变量来建模：
+
+- callbacks：回调队列，记录下一个tick要执行的所有回调
+- pending：指示是否正在运行上一个tick的回调
+- microTimerFunc：microtask的实现方式
+- macroTimerFunc：macrotask的实现方式
+- useMacroTask：指示是否使用macrotask
+
 ```typescript
-// 回调队列，记录当前tick的所有回调
+// 回调队列，记录下一个tick的所有回调
 const callbacks = []
 // 用于指示是否正在运行上一个tick的callbacks
 let pending = false
@@ -56,7 +59,13 @@ let microTimerFunc
 let macroTimerFunc
 // 用于指示是否使用macroTimerFunc
 let useMacroTask = false
+```
 
+### macroTimerFunc
+
+决定使用MacroTask来执行的方式，优先级为：setImmediate > MessageChannel > setTimeout
+
+```typescript
 /**
  * 决定macroTimerFunc的实现。
  * 先用setImmediate（仅IE支持），没有就用MessageChannel，最后使用setTimeout
@@ -86,7 +95,13 @@ else {
     setTimeout(flushCallbacks, 0)
   }
 }
+```
 
+### microTimerFunc
+
+决定使用MicroTask执行的方式，首选Promise，不支持则转macroTimerFunc
+
+```typescript
 /**
  * 决定microTimerFunc的实现。
  * 先用Promise，没有就直接套用MacroTimerFunc
@@ -103,17 +118,11 @@ if(typeof Promise !== 'undefined' && isNative(Promise)) {
 } else {
   microTimerFunc = macroTimerFunc
 }
+```
 
-// 返回一个闭包，使得该fn强制在MacroTask中执行
-function withMacroTask(fn: Function) {
-  return fn._withTask || (fn._withTask = function() {
-    useMacroTask = true
-    const res = fn.apply(null, arguments)
-    useMacroTask = false
-    return res
-  })
-}
+### 核心：Vue.nextTick()实现
 
+```typescript
 /**
  * Vue.nextTick的实现
  */
@@ -151,12 +160,25 @@ function nextTick(cb?: Function, ctx?: Object) {
     })
   }
 }
+```
 
+### 其他的helper函数
+
+```typescript
+// 返回一个闭包，使得该fn强制在MacroTask中执行
+function withMacroTask(fn: Function) {
+  return fn._withTask || (fn._withTask = function() {
+    useMacroTask = true
+    const res = fn.apply(null, arguments)
+    useMacroTask = false
+    return res
+  })
+}
 ```
 
 
 
-## 4. util/lang.js
+## 2. util/lang.js
 
 提供一些通用方法
 
@@ -196,7 +218,7 @@ export function parsePath(path: string): any {
 
 
 
-## 5. util/error.js
+## 3. util/error.js
 
 针对`ViewModel`的错误处理器，会输出错误栈以便进行追踪
 
@@ -251,17 +273,40 @@ function handleError(err: Error, vm: any, info: string) {
 
 
 
-## 6. util/perm.js
+## 4. util/perm.js
 
 `Performance` API相关的操作，用来记录操作发生的时间戳和计算某些操作所用的时间。
 
 ```typescript
+export let mark
+export let measure
 
+if (process.env.NODE_ENV !== 'production') {
+  const perf = inBrowser && window.performance
+  // 检查浏览器是否支持Performance API
+  if (
+    perf &&
+    perf.mark &&
+    perf.measure &&
+    perf.clearMarks &&
+    perf.clearMeasures
+  ) {
+    // 记录发生的时间戳
+    mark = tag => perf.mark(tag)
+    // 计算两次记录的时间间隔，完成后消除相关记录和计算记录
+    measure = (name, startTag, endTag) => {
+      perf.measure(name, startTag, endTag)
+      perf.clearMarks(startTag)
+      perf.clearMarks(endTag)
+      perf.clearMeasures(name)
+    }
+  }
+}
 ```
 
 
 
-## 7. util/env.js
+## 5. util/env.js
 
 `env`用于检测相关的系统环境。对于环境和设备类型的检测非常重要，可以根据其差异，来优化用户体验。
 
@@ -358,7 +403,7 @@ if (typeof Set !== 'undefined' && isNative(Set)) {
 
 
 
-## 8. util/debug.js
+## 6. util/debug.js
 
  debug模式下的一些信息输出
 

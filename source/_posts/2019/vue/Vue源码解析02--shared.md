@@ -1,10 +1,10 @@
 ---
-title: Vue源码解析2--shared
-date: 2018-05-14 14:48:15
+title: Vue源码解析02--shared
+date: 2019-04-26 18:31:02
 categories: 
-- 源码分析
-tags:
-- Vue
+- 前端开发
+tags: 
+- 技术原理
 ---
 
 ## 1. constants.js 全局常量
@@ -34,6 +34,8 @@ const LIFECYCLE_HOOKS = {
   'errorCaptured'
 }
 ```
+
+
 
 ## 2. util.js 通用的函数
 

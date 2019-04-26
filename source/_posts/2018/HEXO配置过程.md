@@ -65,7 +65,7 @@ $ hexo s -p 4001
 如果不想要将网站部署在master分支，在某一个Repo下建立gh-pages分支，部署的时候再部署到这个分支上（部署的过程将会在后面描述）。
 
 branch准备完成以后，需要在Github的Repo中，选择Settings -> Github Pages选项，将Source选择到你使用的branch上面，就可以打开Github Pages功能了。
-{% asset_img gitpage.png GitPages %}
+{% asset_img gitpage.png GitPage示例 %}
 
 ### Hexo在Git上部署
 ##### 1.Git的配置

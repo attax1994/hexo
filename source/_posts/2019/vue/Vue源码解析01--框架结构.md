@@ -1,10 +1,10 @@
 ---
-title: Vue源码解析1--框架结构
-date: 2018-05-14 14:39:23
+title: Vue源码解析01--框架结构
+date: 2019-04-26 18:31:01
 categories: 
-- 源码分析
-tags:
-- Vue
+- 前端开发
+tags: 
+- 技术原理
 ---
 
 Vue/src：
@@ -15,8 +15,7 @@ Vue/src：
 - sfc：单文件组件（Single File Component）
 - shared：通用的 constants 和 util
 
-Vue/flow：各模块的类型声明（针对flow）
+Vue/flow：各模块的类型声明（针对flow.js）
 
 Vue/types：各模块的类型声明（针对TypeScript）
-
 
